@@ -227,14 +227,14 @@
 				var n = chrID(x);
 				if (en)
 					switch (parseInt(d.Sf["LA"+n].value)) {
-						case 0: break; // disable ABL
+						//case 0: break; // disable ABL
 						case 15: sel.value = 15; break;
-						case 30: sel.value = 30; break;
-						case 35: sel.value = 35; break;
-						case 55: sel.value = 55; break;
-						case 255: sel.value = 255; break;
+						//case 30: sel.value = 30; break;
+						//case 35: sel.value = 35; break;
+						//case 55: sel.value = 55; break;
+						//case 255: sel.value = 255; break;
 					}
-				else sel.value = 0;
+				else sel.value = 15;
 				enLA(sel,n); // configure individual limiter
 			});
 			enABL();
@@ -548,15 +548,11 @@ ${i+1}:
 <select name="LT${s}" onchange="UI(true)"></select><br>
 <div id="abl${s}">
 mA/LED: <select name="LAsel${s}" onchange="enLA(this,'${s}');UI();">
-<option value="55" selected>55mA (typ. 5V WS281x)</option>
-<option value="35">35mA (eco WS2812)</option>
-<option value="30">30mA (typ. 12V)</option>
-<option value="255">12mA (WS2815)</option>
-<option value="15">15mA (seed/fairy pixels)</option>
-<option value="0">Custom</option>
+<option value="15" selected>15mA (seed/fairy pixels)</option>
+
 </select><br>
 <div id="LAdis${s}" style="display: none;">max. mA/LED: <input name="LA${s}" type="number" min="1" max="255" oninput="UI()"> mA<br></div>
-<div id="PSU${s}">PSU: <input name="MA${s}" type="number" class="xl" min="250" max="65000" oninput="UI()" value="250"> mA<br></div>
+<div id="PSU${s}">PSU: <input name="MA${s}" type="number" class="xl" min="250" max="750" oninput="UI()" value="350"> mA<br></div>
 </div>
 <div id="co${s}" style="display:inline">Color Order:
 <select name="CO${s}">
@@ -571,9 +567,9 @@ mA/LED: <select name="LAsel${s}" onchange="enLA(this,'${s}');UI();">
 <div id="dig${s}l" style="display:none">Clock: <select name="SP${s}"><option value="0">Slowest</option><option value="1">Slow</option><option value="2">Normal</option><option value="3">Fast</option><option value="4">Fastest</option></select></div>
 <div>
 <span id="psd${s}">Start:</span> <input type="number" name="LS${s}" id="ls${s}" class="l starts" min="0" max="8191" value="${lastEnd(i)}" oninput="startsDirty[${i}]=true;UI();" required />&nbsp;
-<div id="dig${s}c" style="display:inline">Length: <input type="number" name="LC${s}" class="l" min="1" max="${maxPB}" value="1" required oninput="UI();" /></div><br>
+<div id="dig${s}c" style="display:inline">Length: <input type="number" name="LC${s}" class="l" min="1" max="${maxPB}" value="1" disabled required oninput="UI();" /></div><br>
 </div>
-<span id="p0d${s}">GPIO:</span><input type="number" name="L0${s}" required class="s" onchange="UI();pinUpd(this);"/>
+<span id="p0d${s}">GPIO:</span><input type="number" name="L0${s}" required class="s" disabled onchange="UI();pinUpd(this);"/>
 <span id="p1d${s}"></span><input type="number" name="L1${s}" class="s" onchange="UI();pinUpd(this);"/>
 <span id="p2d${s}"></span><input type="number" name="L2${s}" class="s" onchange="UI();pinUpd(this);"/>
 <span id="p3d${s}"></span><input type="number" name="L3${s}" class="s" onchange="UI();pinUpd(this);"/>
@@ -1014,14 +1010,11 @@ Swap: <select id="xw${s}" name="XW${s}">
 		<span id="psu2"><br></span>
 		<br>
 		Global brightness factor: <input name="BF" type="number" class="m" min="1" max="255" required> %<br>
-		Enable automatic brightness limiter: <input type="checkbox" name="ABL" onchange="enABL()"><br>
+		Enable automatic brightness limiter: <input type="checkbox" name="ABL" disabled onchange="enABL()"><br>
 		<div id="abl">
-			<i>Automatically limits brightness to stay close to the limit.<br>
-				Keep at &lt;1A if powering LEDs directly from the ESP 5V pin!<br>
-				If using multiple outputs it is recommended to use per-output limiter.<br>
-				Analog (PWM) and virtual LEDs cannot use automatic brightness limiter.<br></i>
+			<i>Automatically limits brightness to stay close to the limit.<br></i>
 			<div id="psuMA">Maximum PSU Current: <input name="MA" type="number" class="xl" min="250" max="65000" oninput="UI()" required> mA<br></div>
-			Use per-output limiter: <input type="checkbox" name="PPL" onchange="UI()"><br><br>
+			Use per-output limiter: <input type="checkbox" name="PPL" disabled onchange="UI()"><br><br>
 			<div id="ppldis" style="display:none;">
 				<i>Make sure you enter correct value for each LED output.<br>
 				If using multiple outputs with only one PSU, distribute its power proportionally amongst outputs.</i><br>

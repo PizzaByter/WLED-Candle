@@ -1,0 +1,9 @@
+run in WLED directory
+
+#E5
+python -m esptool --chip esp32c3 merge_bin --output candle-c3-E5.bin 0x0000 .pio/build/esp32c3candle/bootloader.bin 0x8000 .pio/build/esp32c3candle/partitions.bin 0x10000 .pio/build/esp32c3candle/firmware.bin 0x310000 littlefs-builder/E5-littlefs.bin
+python -m esptool --chip esp32c3 --port COM7 --baud 921600 write_flash 0x0 candle-c3-E5.bin
+
+#E1
+python -m esptool --chip esp32s3 merge_bin --output candle-s3-E1.bin 0x0000 .pio/build/esp32s3candle/bootloader.bin 0x8000 .pio/build/esp32s3candle/partitions.bin 0x10000 .pio/build/esp32s3candle/firmware.bin 0x310000 littlefs-builder/E1-littlefs.bin
+python -m esptool --chip esp32s3 --port COM13 --baud 921600 write_flash 0x0 candle-s3-E1.bin

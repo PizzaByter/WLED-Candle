@@ -394,7 +394,11 @@ WLED_GLOBAL uint8_t txPower _INIT(WIFI_POWER_19_5dBm);
 
 // LED CONFIG
 WLED_GLOBAL bool turnOnAtBoot _INIT(true);                // turn on LEDs at power-up
-WLED_GLOBAL byte bootPreset   _INIT(0);                   // save preset to load after power-up
+#ifdef CANDLE
+  WLED_GLOBAL byte bootPreset   _INIT(1);                   // we need fire animation out of the box so it works with any config
+#else
+  WLED_GLOBAL byte bootPreset   _INIT(0);                   // save preset to load after power-up
+#endif
 
 //if true, a segment per bus will be created on boot and LED settings save
 //if false, only one segment spanning the total LEDs is created,
@@ -411,7 +415,11 @@ WLED_GLOBAL bool cctICused          _INIT(false); // CCT IC used (Athom 15W bulb
 #endif
 WLED_GLOBAL bool gammaCorrectCol    _INIT(true);  // use gamma correction on colors
 WLED_GLOBAL bool gammaCorrectBri    _INIT(false); // use gamma correction on brightness
-WLED_GLOBAL float gammaCorrectVal   _INIT(2.2f);  // gamma correction value
+#ifdef CANDLE
+  WLED_GLOBAL float gammaCorrectVal   _INIT(2.8f);  // gamma correction value
+#else
+  WLED_GLOBAL float gammaCorrectVal   _INIT(2.2f);  // gamma correction value
+#endif
 
 WLED_GLOBAL byte colPri[] _INIT_N(({ 0, 0, 0, 0 }));   // current RGB(W) primary color. colPri[] should be updated if you want to change the color.
 WLED_GLOBAL byte colSec[] _INIT_N(({ 0, 0, 0, 0 }));   // current RGB(W) secondary color
@@ -673,8 +681,14 @@ WLED_GLOBAL bool sendNotificationsRT  _INIT(false);           // master notifica
 WLED_GLOBAL unsigned long notificationSentTime _INIT(0);
 WLED_GLOBAL byte notificationSentCallMode _INIT(CALL_MODE_INIT);
 WLED_GLOBAL uint8_t notificationCount _INIT(0);
-WLED_GLOBAL uint8_t syncGroups    _INIT(0x01);                // sync send groups this instance syncs to (bit mapped)
-WLED_GLOBAL uint8_t receiveGroups _INIT(0x01);                // sync receive groups this instance belongs to (bit mapped)
+#ifdef CANDLE
+  //candles default to group 4, not group 1
+  WLED_GLOBAL uint8_t syncGroups    _INIT(0x04);                // sync send groups this instance syncs to (bit mapped)
+  WLED_GLOBAL uint8_t receiveGroups _INIT(0x04);                // sync receive groups this instance belongs to (bit mapped)
+#else
+  WLED_GLOBAL uint8_t syncGroups    _INIT(0x01);                // sync send groups this instance syncs to (bit mapped)
+  WLED_GLOBAL uint8_t receiveGroups _INIT(0x01);                // sync receive groups this instance belongs to (bit mapped)
+#endif
 #ifdef WLED_SAVE_RAM
 // this will save us 8 bytes of RAM while increasing code by ~400 bytes
 typedef class Receive {
@@ -740,8 +754,16 @@ WLED_GLOBAL bool receiveNotificationBrightness _INIT(true);       // apply brigh
 WLED_GLOBAL bool receiveNotificationColor      _INIT(true);       // apply color
 WLED_GLOBAL bool receiveNotificationEffects    _INIT(true);       // apply effects setup
 WLED_GLOBAL bool receiveNotificationPalette    _INIT(true);       // apply palette
-WLED_GLOBAL bool receiveSegmentOptions         _INIT(false);      // apply segment options
-WLED_GLOBAL bool receiveSegmentBounds          _INIT(false);      // apply segment bounds (start, stop, offset)
+#ifdef CANDLE
+  //candles have 2 segments, front and rear, segment options required rec enabled for both sides to sync with colors
+  //segmend bounds is only needed if layering or changing the segment size, disable if candle is syncing to device with different matrix size
+  //we need this default to persist over factory reset, which is why the change is here vs config template json on little fs.
+  WLED_GLOBAL bool receiveSegmentOptions         _INIT(true);      // apply segment options
+  WLED_GLOBAL bool receiveSegmentBounds          _INIT(true);      // apply segment bounds (start, stop, offset)
+#else
+  WLED_GLOBAL bool receiveSegmentOptions         _INIT(false);      // apply segment options
+  WLED_GLOBAL bool receiveSegmentBounds          _INIT(false);      // apply segment bounds (start, stop, offset)
+#endif
 WLED_GLOBAL bool receiveDirect _INIT(true);                       // receive UDP/Hyperion realtime
 WLED_GLOBAL bool notifyDirect _INIT(true);                        // send notification if change via UI or HTTP API
 WLED_GLOBAL bool notifyButton _INIT(true);                        // send if updated by button or infrared remote
@@ -792,7 +814,12 @@ WLED_GLOBAL udp_port_t udp _INIT_N(({21324, 65506, 19446, 0, false, false, false
 WLED_GLOBAL uint16_t udpPort    _INIT(21324); // WLED notifier default port
 WLED_GLOBAL uint16_t udpPort2   _INIT(65506); // WLED notifier supplemental port
 WLED_GLOBAL uint16_t udpRgbPort _INIT(19446); // Hyperion port
-WLED_GLOBAL uint8_t  udpNumRetries _INIT(0);  // Number of times a UDP sync message is retransmitted. Increase to increase reliability
+#ifdef CANDLE
+  // lots of candles in a home, some may miss UDP packet occasionally. at least 2 retries will be a better experience.
+  WLED_GLOBAL uint8_t  udpNumRetries _INIT(2);  // Number of times a UDP sync message is retransmitted. Increase to increase reliability
+#else
+  WLED_GLOBAL uint8_t  udpNumRetries _INIT(0);  // Number of times a UDP sync message is retransmitted. Increase to increase reliability
+#endif
 WLED_GLOBAL bool     udpConnected _INIT(false);
 WLED_GLOBAL bool     udp2Connected _INIT(false);
 WLED_GLOBAL bool     udpRgbConnected _INIT(false);
